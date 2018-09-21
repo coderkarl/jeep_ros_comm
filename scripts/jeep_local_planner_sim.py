@@ -3,7 +3,7 @@
 import rospy, math
 import numpy as np
 from geometry_msgs.msg import Twist
-from wheele_msgs.msg import SpeedCurve
+#from wheele_msgs.msg import SpeedCurve
 from std_msgs.msg import Int16
 from nav_msgs.msg import Odometry, Path
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
@@ -27,7 +27,7 @@ class PathController():
         self.vx = 0.0
         self.cum_err = 0
         
-        MAX_SPEED = 1.0
+        MAX_SPEED = 1.2
         MAX_OMEGA = 2.0
         self.diff_drive_controller = DiffDriveController(MAX_SPEED, MAX_OMEGA)
         

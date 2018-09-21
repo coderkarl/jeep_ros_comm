@@ -114,6 +114,8 @@ class Jeep():
                 v = 1.0
             curv = MAX_CURVATURE*np.sign(w/v)
         elif(abs(v) > 0):
+            #if(abs(v) < 0.8):
+            #    v = 0.8*np.sign(v)
             curv = w/v
             if(abs(curv) > MAX_CURVATURE):
                 curv = MAX_CURVATURE*np.sign(w/v)
@@ -276,7 +278,7 @@ class Jeep():
         if(abs(accx) < 3 and abs(accy) < 3):
             try:
                 roll_rad = math.asin(accx/9.81) +0.01
-                pitch_rad = math.asin(accy/9.81) -0.14
+                pitch_rad = math.asin(accy/9.81) -0.09
             except:
                 roll_rad = self.roll_rad
                 pitch_rad = self.pitch_rad
