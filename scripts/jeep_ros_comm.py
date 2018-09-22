@@ -220,10 +220,10 @@ class Jeep():
             dtheta_gyro_deg = 0
         else:
             gz_dps = (gyroz+g_bias)*180/3.14*0.97
-            #if(gz_dps > 0):
-            #    gz_dps = gz_dps * 1.2
-            #else:
-            #    gz_dps = gz_dps * 1.1
+            if(gz_dps > 0):
+                gz_dps = gz_dps * 1.0
+            else:
+                gz_dps = gz_dps * 0.98
 
             dtheta_gyro_deg = gz_dps*dt
 
