@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy, math
-from geometry_msgs.msg import Twist, Quaternion, Point, Pose, Vector3
+from geometry_msgs.msg import Twist, Quaternion, Point, Pose, Vector3, Vector3Stamped
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Int16
 import tf
@@ -80,6 +80,9 @@ class Jeep():
         rospy.Subscriber(twist_cmd_topic, Twist, self.drive_callback, queue_size=1)
         rospy.Subscriber('blade_cmd', Int16, self.blade_callback, queue_size=2)
         
+        self.cal_pub = rospy.Publisher('imu_cal', Int16, queue_size = 2)
+        self.mag_pub = rospy.Publisher('magXYZ', Vector3Stamped, queue_size = 2)
+        self.accel_pub = rospy.Publisher('accelXYZ', Vector3Stamped, queue_size = 2)
         self.odom_pub = rospy.Publisher('odom', Odometry, queue_size=5)
         self.odom_broadcaster = tf.TransformBroadcaster()
         
@@ -90,6 +93,7 @@ class Jeep():
         self.steer = 570
         self.bot = MyBot(0,0,0,1,0)
         self.prev_time = rospy.Time.now()
+        self.mag_time = self.prev_time
         self.dist_sum = 0
         self.time_sum = 0
         self.vx = 0
@@ -161,6 +165,25 @@ class Jeep():
         gyro_thresh = 0.01 #0.05
         g_bias = 0.0033 #0.016 #0.007
         MAX_DTHETA_GYRO = 5
+        
+        if( (t2 - self.mag_time).to_sec() >= 0.2 ):
+            self.mag_time = t2
+            self.ardIMU.safe_write('A5/8/')
+            mag_cal = self.ardIMU.safe_read()
+            magx = self.ardIMU.safe_read()
+            magy = self.ardIMU.safe_read()
+            magz = self.ardIMU.safe_read()
+            
+            cal_val = Int16()
+            cal_val.data = int(mag_cal)*5
+            self.cal_pub.publish(cal_val)
+            
+            magXYZ = Vector3Stamped()
+            magXYZ.header.stamp = t2
+            magXYZ.vector.x = float(int(magx)/10.0)
+            magXYZ.vector.y = float(int(magy)/10.0)
+            magXYZ.vector.z = float(int(magz)/10.0)
+            self.mag_pub.publish(magXYZ)
             
         try:
             self.ardIMU.safe_write('A5/1/')
@@ -180,6 +203,13 @@ class Jeep():
             accy = float(int(accy)-3000)/100.0
             accz = float(int(accz)-3000)/100.0
             gyroz = float(int(gyroz)-1000)/100.0
+            
+            accelXYZ = Vector3Stamped()
+            accelXYZ.header.stamp = t2
+            accelXYZ.vector.x = accx
+            accelXYZ.vector.y = accy
+            accelXYZ.vector.z = accz
+            self.accel_pub.publish(accelXYZ)
         except:
             accx = 0
             accy = 0
@@ -277,8 +307,8 @@ class Jeep():
         br = tf.TransformBroadcaster()
         if(abs(accx) < 3 and abs(accy) < 3):
             try:
-                roll_rad = math.asin(accx/9.81) +0.01
-                pitch_rad = math.asin(accy/9.81) -0.09
+                roll_rad = math.asin(accx/9.81) + 0.012 #confirmed with turn-around cal on concrete using rqt_plot
+                pitch_rad = math.asin(accy/9.81) -0.075 - 0.04 #-0.04rad pitch back lidar, #-0.075 for body-ground confirmed with turn-around cal on conrete using rqt_plot
             except:
                 roll_rad = self.roll_rad
                 pitch_rad = self.pitch_rad
