@@ -1,6 +1,7 @@
 <launch>
   <include file="$(find my_joystick)/launch/vel_jeep_joystick.launch" />
-  <include file="$(find sweep_ros)/launch/sweep2scan.launch" />
+  <!-- <include file="$(find sweep_ros)/launch/sweep2scan.launch" /> -->
+  <include file="$(find rplidar_ros)/launch/rplidar_a3.launch" />
   <node pkg="jeep_ros_comm" type="jeep_ros_comm.py" name="jeep_ros_comm" />
   
 </launch>

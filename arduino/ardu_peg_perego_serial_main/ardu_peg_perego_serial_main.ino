@@ -70,13 +70,13 @@ void setup()
   if(cur_pos > right_steer_thresh)
   {
     mySteerCommand(-steer_power);
-    do{steer_pos = analogRead(steerPot);}while(steer_pos > right_steer_thresh);
+    //do{steer_pos = analogRead(steerPot);}while(steer_pos > right_steer_thresh);
     mySteerCommand(0);
   }
   else if(cur_pos < left_steer_thresh)
   {
     mySteerCommand(steer_power);
-    do{steer_pos = analogRead(steerPot);}while(steer_pos < left_steer_thresh);
+    //do{steer_pos = analogRead(steerPot);}while(steer_pos < left_steer_thresh);
     mySteerCommand(0);
   }
   

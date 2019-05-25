@@ -307,8 +307,8 @@ class Jeep():
         br = tf.TransformBroadcaster()
         if(abs(accx) < 3 and abs(accy) < 3):
             try:
-                roll_rad = math.asin(accx/9.81) + 0.012 #confirmed with turn-around cal on concrete using rqt_plot
-                pitch_rad = math.asin(accy/9.81) -0.075 - 0.04 #-0.04rad pitch back lidar, #-0.075 for body-ground confirmed with turn-around cal on conrete using rqt_plot
+                roll_rad = math.asin(accx/9.81) + 0.004 #confirmed with turn-around cal on concrete using rqt_plot
+                pitch_rad = math.asin(accy/9.81) -0.061 - 0.01 #-0.01rad pitch back lidar, #-0.075 for body-ground confirmed with turn-around cal on conrete using rqt_plot
             except:
                 roll_rad = self.roll_rad
                 pitch_rad = self.pitch_rad
@@ -320,7 +320,7 @@ class Jeep():
                 
         self.roll_rad = 0.99*self.roll_rad + 0.01*roll_rad
         self.pitch_rad = 0.99*self.pitch_rad + 0.01*pitch_rad
-        laser_quat = tf.transformations.quaternion_from_euler(self.roll_rad, self.pitch_rad, 0)
+        laser_quat = tf.transformations.quaternion_from_euler(-self.roll_rad, -self.pitch_rad, 3.14159) #- roll, -pitch b/c of 180 deg yaw
         br.sendTransform((0,0,0),laser_quat,t2,"laser","base_link")
         #####
         
